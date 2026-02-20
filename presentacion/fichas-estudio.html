@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fichas de Repaso DHCP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        
+/* 1. THE SETUP */
+* { box-sizing: border-box; }
+p { margin: 0; margin-bottom: 15px; }
+
+body {
+  background-color: #cbd5e1;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+  margin: 0;
+  min-height: 100vh;
+  padding: 20px 0;
+  place-items: center;
+}
+
+.slide-container {
+  align-items: center;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Lato', sans-serif;
+  height: 720px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 60px;
+  position: relative;
+  width: 1280px;
+}
+
+/* 1.1 BACKGROUND STYLING */
+.slide-container.dark-bg {
+  background-color: #0f172a;
+}
+.slide-container.dark-bg::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at top right, #1e293b, transparent 60%);
+  z-index: 0;
+}
+.slide-container > * { position: relative; z-index: 1; }
+
+/* 2. CONSISTENT TYPOGRAPHY */
+.slide-container h1, .slide-container h2, .slide-container h3 {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+}
+
+.slide-container h1 { color: #f8fafc; font-size: 75px; font-weight: 700; text-align: center; }
+.slide-container.dark-bg h2 { color: #f8fafc; font-size: 65px; font-weight: 600; margin-bottom: 20px;}
+.slide-container h2.slide-title { color: #1e293b; font-size: 40px; font-weight: 600; margin-bottom: 40px; text-align: left; width: 100%; }
+.slide-container h3 { color: #1e293b; font-size: 32px; font-weight: 600; margin-bottom: 15px; }
+.slide-container.dark-bg p { color: #94a3b8; }
+.slide-container.dark-bg .subtitle { color: #38bdf8; font-size: 24px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;}
+
+.slide-container p, .slide-container li, .slide-container td, .slide-container th {
+  color: #475569;
+  font-family: 'Lato', sans-serif;
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.slide-container .content-area {
+  align-items: center; display: flex; flex-direction: column; flex-grow: 1; justify-content: center; width: 100%;
+}
+
+/* 3. LAYOUT DEFINITIONS */
+.title-layout { text-align: center; }
+.section-title-layout { align-items: center; display: flex; flex-direction: column; height: 100%; justify-content: center; text-align: center; width: 100%; }
+.section-title-layout hr { background-color: #3b82f6; border: none; height: 6px; margin: 30px auto; width: 120px; border-radius: 3px;}
+
+.two-column { align-items: stretch; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; width: 100%; }
+.two-column.tiled > div { background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 40px; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.two-column.tiled h3 { color: #3b82f6; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
+.two-column ul { list-style: none; margin: 0; padding: 0; }
+.two-column li { margin-bottom: 15px; padding-left: 25px; position: relative; }
+.two-column li::before { content: '\f054'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #10b981; position: absolute; left: 0; top: 2px; font-size: 16px; }
+
+.tiled-content { align-items: stretch; display: flex; gap: 40px; justify-content: center; width: 100%; }
+.tile { align-items: center; background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; flex: 1; justify-content: flex-start; padding: 35px 25px; text-align: center; }
+.tile .icon { color: #3b82f6; font-size: 55px; margin-bottom: 25px; }
+
+.quote-layout { margin: 0 auto; text-align: center; width: 85%; }
+.quote-layout blockquote { color: #1e293b; font-size: 46px; font-weight: 600; font-family: 'Poppins', sans-serif; line-height: 1.4; margin: 0 0 30px 0; padding: 0 50px; position: relative; }
+.quote-layout blockquote::before, .quote-layout blockquote::after { color: #bae6fd; font-family: sans-serif; content: '"'; font-size: 120px; line-height: 0; position: absolute; }
+.quote-layout blockquote::before { left: -20px; top: 40px; }
+.quote-layout blockquote::after { bottom: -10px; right: -20px; }
+.quote-layout cite { color: #3b82f6; font-size: 24px; font-style: normal; font-weight: 700; }
+
+.highlight-numbers-layout > div:first-child { flex: 0 0 45%; text-align: center; }
+.highlight-numbers-layout .number { color: #3b82f6; font-size: 140px; font-weight: 700; font-family: 'Poppins', sans-serif; line-height: 1; margin-bottom: 10px; text-shadow: 2px 2px 0px #bae6fd; }
+.highlight-numbers-layout .number-label { color: #1e293b; font-size: 26px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;}
+
+.image-tile { flex: 1; text-align: center; background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.image-tile .image-wrapper { height: 180px; margin-bottom: 20px; border-radius: 8px; overflow: hidden; background-color: #f1f5f9; display: flex; align-items: center; justify-content: center;}
+.image-tile .image-wrapper i { font-size: 80px; color: #94a3b8; }
+.image-tile h3 { font-size: 24px; color: #1e293b; margin-bottom: 10px; }
+.image-tile p { font-size: 16px; line-height: 1.4; }
+
+.table-layout { width: 100%; background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.table-layout table { border-collapse: collapse; width: 100%; }
+.table-layout th, .table-layout td { border-bottom: 1px solid #e2e8f0; padding: 22px 30px; text-align: left; }
+.table-layout th { background-color: #f1f5f9; color: #1e293b; font-size: 22px; font-weight: 700; font-family: 'Poppins', sans-serif; }
+.table-layout tr:last-child td { border-bottom: none; }
+.table-layout td strong { color: #3b82f6; font-weight: 700; }
+
+.image-right-layout { align-items: center; display: grid; gap: 50px; grid-template-columns: 1.2fr 0.8fr; width: 100%; }
+.image-right-layout .text-content h3 { color: #ef4444; font-size: 36px; }
+.image-right-layout .image-wrapper { border-radius: 12px; height: 350px; overflow: hidden; width: 100%; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: 4px solid #ffffff; display: flex; align-items: center; justify-content: center; background-color: #1e293b;}
+.image-right-layout .image-wrapper i { font-size: 120px; color: #3b82f6; }
+
+.bullet-list { max-width: 1000px; width: 100%; background-color: #ffffff; border-radius: 12px; padding: 40px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.bullet-list ul { list-style: none; margin: 0; padding: 0; }
+.bullet-list li { gap: 20px; margin-bottom: 25px; padding-left: 55px; position: relative; font-size: 22px; }
+.bullet-list i { font-size: 30px; left: 0; margin-top: 2px; position: absolute; text-align: center; top: 0; }
+.bullet-list i.fa-shield-halved { color: #3b82f6; }
+.bullet-list i.fa-triangle-exclamation { color: #ef4444; }
+.bullet-list li strong { color: #1e293b; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<!-- Slide 1: Title -->
+<div class="slide-container dark-bg" id="slide1">
+    <div class="title-layout">
+        <p class="subtitle">Material de Aula Invertida - 2º ASIR</p>
+        <h1>Fichas de Estudio:<br>Servicio DHCP</h1>
+    </div>
+</div>
+
+<!-- Slide 2: El Problema Original -->
+<div class="slide-container" id="slide2">
+    <h2 class="slide-title">¿Por qué existe el DHCP?</h2>
+    <div class="content-area">
+        <div class="two-column tiled">
+            <div>
+                <h3><i class="fa-solid fa-server"></i> El Pasado: Configuración Manual</h3>
+                <p>En las redes antiguas, el administrador introducía IP, Máscara, Puerta de Enlace y DNS <strong>equipo por equipo</strong> a mano.</p>
+                <ul>
+                    <li>Generaba conflictos de IP (dos equipos con la misma IP).</li>
+                    <li>Imposible de escalar con la llegada de portátiles y móviles.</li>
+                </ul>
+            </div>
+            <div>
+                <h3><i class="fa-solid fa-bolt"></i> La Solución: Plug & Play</h3>
+                <p>DHCP convierte la red en dinámica. Un dispositivo se conecta y recibe toda la configuración al instante.</p>
+                <ul>
+                    <li>Gestión centralizada desde un único servidor.</li>
+                    <li>Las IPs "vuelven a la piscina" y se reutilizan cuando los equipos se van.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 3: Section Title -->
+<div class="slide-container dark-bg" id="slide3">
+    <div class="section-title-layout">
+        <hr>
+        <h2>Fundamentos y Protocolo</h2>
+        <p>Entendiendo la arquitectura y el modelo de comunicación</p>
+    </div>
+</div>
+
+<!-- Slide 4: Arquitectura -->
+<div class="slide-container" id="slide4">
+    <h2 class="slide-title">Arquitectura Cliente-Servidor</h2>
+    <div class="content-area">
+        <div class="two-column tiled">
+            <div>
+                <h3>Transporte y Puertos</h3>
+                <p>DHCP utiliza el protocolo de transporte <strong>UDP</strong> por su velocidad y naturaleza no orientada a conexión (vital cuando no hay IP aún).</p>
+                <ul>
+                    <li><strong>Puerto UDP 67:</strong> Donde escucha el Servidor.</li>
+                    <li><strong>Puerto UDP 68:</strong> Donde escucha el Cliente.</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Broadcast inicial</h3>
+                <p>Un cliente recién conectado sufre de "amnesia de red". No tiene IP ni sabe dónde está el servidor.</p>
+                <p>Por ello, inicia la comunicación enviando paquetes de <strong>Broadcast</strong> (255.255.255.255), gritando a toda la red local para localizar ayuda.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 5: D.O.R.A. -->
+<div class="slide-container" id="slide5">
+    <h2 class="slide-title">El Ciclo D.O.R.A.</h2>
+    <div class="content-area">
+        <div class="tiled-content">
+            <div class="tile"><div class="icon"><i class="fa-solid fa-satellite-dish"></i></div><h3>Discover</h3><p>El cliente emite un Broadcast a la red diciendo: "¡Hola! No tengo IP, ¿hay algún servidor DHCP por aquí?"</p></div>
+            <div class="tile"><div class="icon"><i class="fa-solid fa-hand-holding-hand"></i></div><h3>Offer</h3><p>El servidor responde ofreciendo una concesión: "Sí, estoy aquí. Te ofrezco usar temporalmente la IP 192.168.1.50."</p></div>
+            <div class="tile"><div class="icon"><i class="fa-solid fa-check-double"></i></div><h3>Req. & Ack.</h3><p>El cliente hace un <strong>Request</strong> aceptando la oferta, y el servidor envía el <strong>Ack</strong> final validando la transacción.</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 6: Quote Lease Time -->
+<div class="slide-container" id="slide6">
+    <div class="content-area">
+        <div class="quote-layout">
+            <blockquote>La dirección IP no se regala, se alquila por un tiempo determinado.</blockquote>
+            <cite>El concepto del "Lease Time" (Tiempo de concesión)</cite>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 7: Tiempos de Renovación -->
+<div class="slide-container" id="slide7">
+    <h2 class="slide-title">Tiempos de Renovación</h2>
+    <div class="content-area">
+        <div class="two-column highlight-numbers-layout" style="align-items: center;">
+            <div>
+                <div class="number">50%</div>
+                <div class="number-label">Temporizador T1</div>
+            </div>
+            <div>
+                <h3>Renovación Unicast</h3>
+                <p>Al transcurrir exactamente la mitad del tiempo de concesión, el cliente intentará renovar amablemente su alquiler contactando directamente al servidor original mediante Unicast.</p>
+                <p>Si el servidor original ha muerto, al llegar al <strong>87.5% (T2)</strong> el cliente enviará un Broadcast desesperado buscando cualquier otro servidor de rescate.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 8: Section Title -->
+<div class="slide-container dark-bg" id="slide8">
+    <div class="section-title-layout">
+        <hr>
+        <h2>Componentes y Configuración</h2>
+        <p>Las piezas que conforman un Servidor DHCP funcional</p>
+    </div>
+</div>
+
+<!-- Slide 9: Anatomía -->
+<div class="slide-container" id="slide9">
+    <h2 class="slide-title">Anatomía del Servidor</h2>
+    <div class="content-area">
+        <div class="tiled-content">
+            <div class="image-tile">
+                <div class="image-wrapper"><i class="fa-solid fa-network-wired"></i></div>
+                <h3>Ámbito y Rango</h3>
+                <p>El <strong>Ámbito (Scope)</strong> define la subred lógica entera. El <strong>Rango</strong> es el tramo exacto de direcciones listas para repartir.</p>
+            </div>
+            <div class="image-tile">
+                <div class="image-wrapper"><i class="fa-solid fa-ban"></i></div>
+                <h3>Exclusiones</h3>
+                <p>Direcciones dentro del rango <strong>prohibidas</strong> para el servidor, normalmente porque están fijadas estáticamente en routers o impresoras.</p>
+            </div>
+            <div class="image-tile">
+                <div class="image-wrapper"><i class="fa-solid fa-lock"></i></div>
+                <h3>Reservas</h3>
+                <p>Asignación estática basada en DHCP. Se vincula una dirección <strong>MAC específica</strong> a una IP para que un equipo siempre obtenga la misma.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 10: OS Implementation -->
+<div class="slide-container" id="slide10">
+    <h2 class="slide-title">Implementación: OS Server</h2>
+    <div class="content-area">
+        <div class="two-column tiled">
+            <div>
+                <h3><i class="fa-brands fa-windows"></i> Windows Server</h3>
+                <p>Se instala como un <strong>Rol de Servidor</strong> y se gestiona mediante una cómoda interfaz gráfica (consola MMC).</p>
+                <ul>
+                    <li>Integración nativa con <strong>Active Directory</strong>.</li>
+                    <li>Requiere ser "Autorizado" en el dominio para funcionar (mecanismo anti Rogue DHCP).</li>
+                </ul>
+            </div>
+            <div>
+                <h3><i class="fa-brands fa-linux"></i> GNU/Linux</h3>
+                <p>Históricamente <strong>isc-dhcp</strong>, hoy <strong>Kea DHCP</strong>. Configuración basada enteramente en ficheros de texto.</p>
+                <ul>
+                    <li>Se configura editando texto (ej: <code>/etc/dhcp/dhcpd.conf</code>).</li>
+                    <li>Sintaxis estricta: olvidar un punto y coma (<code>;</code>) tumba el servicio.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 11: Opciones DHCP -->
+<div class="slide-container" id="slide11">
+    <h2 class="slide-title">Opciones DHCP (RFC 2132)</h2>
+    <div class="content-area">
+        <div class="table-layout">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Código</th>
+                        <th style="width: 35%;">Nombre de la Opción</th>
+                        <th style="width: 50%;">Descripción en ASIR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Opción 1</strong></td>
+                        <td>Subnet Mask (Máscara)</td>
+                        <td>Obligatoria. Define el tamaño y los límites de la red local del cliente.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Opción 3</strong></td>
+                        <td>Router (Puerta de Enlace)</td>
+                        <td>Dirección IP del router por el cual el cliente podrá salir a Internet.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Opción 6</strong></td>
+                        <td>Domain Name Server (DNS)</td>
+                        <td>Servidores encargados de traducir nombres de dominio en direcciones IP.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Opción 66/67</strong></td>
+                        <td>TFTP Server Name / Bootfile</td>
+                        <td>Opciones avanzadas utilizadas para el arranque PXE (instalar SO por red).</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 12: PXE -->
+<div class="slide-container" id="slide12">
+    <h2 class="slide-title">Arranque por Red (PXE)</h2>
+    <div class="content-area">
+        <div class="image-right-layout">
+            <div class="text-content">
+                <h3>Magia ASIR: Bootear sin Disco</h3>
+                <p>Gracias a las <strong>Opciones 66 y 67</strong> de DHCP, un PC "vacío" (sin sistema operativo ni disco duro) puede encenderse y descargar un SO completo a través del cable de red.</p>
+                <p>El DHCP le dice al PC: <em>"Tu servidor de instalación (TFTP) es la IP X y debes descargar el archivo de arranque Y"</em>.</p>
+            </div>
+            <div>
+                <div class="image-wrapper"><i class="fa-solid fa-download"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 13: Peligro de APIPA -->
+<div class="slide-container" id="slide13">
+    <h2 class="slide-title">El Peligro de APIPA</h2>
+    <div class="content-area">
+        <div class="image-right-layout">
+            <div class="text-content">
+                <h3>IP: 169.254.x.x</h3>
+                <p>Si el cliente envía un <em>Discover</em> pero el servidor DHCP está caído (o el cable defectuoso), el sistema operativo entra en modo emergencia.</p>
+                <p>Se auto-asigna una dirección <strong>APIPA</strong> (Automatic Private IP Addressing). Con esto se logra conexión con otros equipos locales en la misma situación, pero <strong>no permite conexión a Internet</strong> al carecer de Puerta de Enlace.</p>
+                <p><em>Tip ASIR: Si ves esta IP en un ipconfig, el problema está en la red, no en el PC.</em></p>
+            </div>
+            <div>
+                <div class="image-wrapper"><i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 14: Troubleshooting -->
+<div class="slide-container" id="slide14">
+    <h2 class="slide-title">Comandos de Diagnóstico</h2>
+    <div class="content-area">
+        <div class="table-layout">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Comando</th>
+                        <th style="width: 25%;">Sistema</th>
+                        <th style="width: 50%;">Función ASIR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ipconfig /release</strong></td>
+                        <td>Windows (Cliente)</td>
+                        <td>Suelta la IP actual y se la devuelve al servidor DHCP.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ipconfig /renew</strong></td>
+                        <td>Windows (Cliente)</td>
+                        <td>Obliga a la tarjeta a iniciar el proceso D.O.R.A. para pedir red.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>dhclient -r / dhclient</strong></td>
+                        <td>GNU/Linux (Cliente)</td>
+                        <td>Equivalente a release (-r) y renew para soltar/pedir IP.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>systemctl status kea</strong></td>
+                        <td>GNU/Linux (Servidor)</td>
+                        <td>Comprueba si el servicio DHCP está corriendo o falló por sintaxis.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 15: Entornos Complejos -->
+<div class="slide-container" id="slide15">
+    <h2 class="slide-title">Seguridad y Entornos Complejos</h2>
+    <div class="content-area">
+        <div class="bullet-list">
+            <ul>
+                <li><i class="fa-solid fa-triangle-exclamation"></i> <strong>Ataque Rogue DHCP:</strong> Si un alumno conecta un router doméstico a la red, este actuará como DHCP falso, repartiendo IPs inválidas, interceptando el tráfico y hundiendo la red del centro.</li>
+                <li><i class="fa-solid fa-shield-halved"></i> <strong>Mitigación (DHCP Snooping):</strong> Los switches corporativos deben configurarse para que solo admitan paquetes <em>Offer</em> desde el puerto legítimo donde conectamos nuestro servidor.</li>
+                <li><i class="fa-solid fa-shield-halved"></i> <strong>Redes con VLANs (DHCP Relay):</strong> Los routers bloquean los Broadcast. Si hay VLANs, se debe usar un <em>DHCP Relay Agent</em> (IP Helper) en el router para que envíe el Broadcast del cliente como Unicast directo al servidor.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 16: Enlaces Oficiales -->
+<div class="slide-container" id="slide16">
+    <h2 class="slide-title">Recursos y Documentación Oficial</h2>
+    <div class="content-area">
+        <div class="two-column tiled">
+            <div>
+                <h3><i class="fa-solid fa-book"></i> Estándares y Linux</h3>
+                <p>Documentación base del protocolo y sistemas libres:</p>
+                <ul style="line-height: 2;">
+                    <li><a href="https://www.redeszone.net/tutoriales/internet/que-es-protocolo-dhcp/" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: bold;">Guía de Funcionamiento DHCP</a></li>
+                    <li><a href="https://www.ibm.com/docs/es/i/7.5.0?topic=concepts-dhcp-options-lookup" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: bold;">Catálogo de Opciones DHCP (IBM)</a></li>
+                    <li><a href="https://kea.readthedocs.io/" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: bold;">Manual Oficial Kea DHCP</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3><i class="fa-brands fa-windows"></i> Microsoft y Cisco</h3>
+                <p>Implementación corporativa y conceptos avanzados:</p>
+                <ul style="line-height: 2;">
+                    <li><a href="https://learn.microsoft.com/es-es/windows-server/networking/technologies/dhcp/dhcp-top" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: bold;">DHCP en Windows Server</a></li>
+                    <li><a href="https://learn.microsoft.com/es-es/troubleshoot/mem/configmgr/os-deployment/understand-pxe-boot" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: bold;">Comprender el arranque PXE</a></li>
+                    <li><a href="https://www.redeszone.net/tutoriales/redes-cable/dhcp-snooping-switches-proteger-red/" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: bold;">Protección con DHCP Snooping</a></li>
+                    <li><a href="https://www.cisco.com/c/es_mx/support/docs/ip/dynamic-address-allocation-resolution/27470-100.html" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: bold;">Cisco: DHCP Relay Agent</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Cajón del vídeo como link -->
+        <div style="width: 100%; background-color: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <h3 style="color: #3b82f6; font-size: 24px; margin-bottom: 15px; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;"><i class="fa-brands fa-youtube" style="color: #ef4444;"></i> Material Audiovisual</h3>
+            <p style="font-size: 16px; margin-bottom: 10px; color: #475569;">Visualiza paso a paso cómo se reparten las direcciones IP en la red:</p>
+            <ul style="list-style: none; margin: 0; padding: 0;">
+                <li style="padding-left: 25px; position: relative; font-size: 16px; margin-bottom: 0;">
+                    <i class="fa-solid fa-chevron-right" style="color: #10b981; position: absolute; left: 0; top: 4px; font-size: 14px;"></i>
+                    <a href="https://www.youtube.com/watch?v=K07wzpcKrsk" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: bold;">Ver vídeo en YouTube: Funcionamiento de DHCP</a>
+                </li>
+            </ul>
+        </div>
+</div>
+
+
+</body>
+</html>

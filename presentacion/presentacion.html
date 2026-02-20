@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Presentación DHCP - Iñigo Durán Sanz</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/league.min.css" id="theme">
+    
+    <style>
+        /* Ajustes tipográficos para un aspecto más limpio y natural */
+        .reveal h2 {
+            font-size: 1.6em;
+            text-transform: none;
+            color: #4b82d4;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .reveal h3 {
+            color: #e0e0e0;
+            text-transform: none;
+        }
+        .reveal h4 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #a0a0a0;
+        }
+        .reveal p {
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .reveal ul, .reveal ol {
+            font-size: 0.85em;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            display: inline-block;
+            text-align: left;
+        }
+        .reveal li {
+            margin-bottom: 12px;
+        }
+        
+        /* Layout a dos columnas */
+        .two-col {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+            width: 100%;
+        }
+        .two-col .col-text {
+            flex: 1.2;
+            text-align: left;
+        }
+        .two-col .col-img {
+            flex: 0.8;
+            text-align: center;
+        }
+        .two-col .col-text ul, .two-col .col-text p {
+            display: block; 
+        }
+        
+        /* Imágenes ajustadas */
+        .slide-image {
+            max-width: 100%;
+            max-height: 450px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+            display: block;
+            margin: 0 auto;
+        }
+        
+        /* Bloque de código */
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 25px;
+            border-radius: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.75em;
+            text-align: left;
+            width: 80%;
+            margin: 20px auto;
+            border-left: 5px solid #4b82d4;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .highlight { color: #569cd6; font-weight: bold; }
+        .string { color: #ce9178; }
+        .number { color: #b5cea8; }
+        
+        /* Destacados */
+        .alert-text { color: #ff6b6b; font-weight: bold; }
+        .success-text { color: #4CAF50; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- 1. Título -->
+            <section>
+                <h2>Servicio de Configuración Automática de Red: DHCP</h2>
+                <h4>2º ASIR - Servicios de Red e Internet</h4>
+                <br>
+                <p>Ponente: <strong>Iñigo Durán Sanz</strong></p>
+                <br>
+                <p><small style="color: #888;"><em>(Proyecto Flipped Classroom)</em></small></p>
+            </section>
+
+            <!-- 2. Índice -->
+            <section>
+                <h2>Índice de Contenidos</h2>
+                <div class="two-col">
+                    <div class="col-text" style="flex: 1;">
+                        <ol style="font-size: 0.8em;">
+                            <li>El problema original: Redes manuales</li>
+                            <li>Conceptos y fundamentos de DHCP</li>
+                            <li>El proceso D.O.R.A. a fondo</li>
+                            <li>Tiempos de concesión (Leases)</li>
+                            <li>Ámbitos, Exclusiones y Reservas</li>
+                            <li>Opciones DHCP (RFC 2132)</li>
+                            <li>Diagnóstico: Cuando actúa APIPA</li>
+                            <li>Entornos enrutados: DHCP Relay</li>
+                            <li>Servidores: Linux vs Windows</li>
+                            <li>Seguridad: Rogue DHCP</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Redes en los 90 -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>El mundo antes de DHCP</h2>
+                        <p>En los años 90, los administradores de sistemas configuraban las redes <strong>puesto por puesto</strong>.</p>
+                        <ul>
+                            <li>Había que introducir a mano: Dirección IP, Máscara, Puerta de Enlace y DNS.</li>
+                            <li>Se llevaban registros en hojas de cálculo o libretas para saber qué IP tenía cada PC.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://i.blogs.es/648d4e/internet90/1366_2000.jpg" alt="Ordenadores antiguos" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. El error humano -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>El problema del error humano</h2>
+                        <p>La configuración manual traía graves dolores de cabeza:</p>
+                        <ul>
+                            <li><strong>IPs duplicadas:</strong> Dos equipos con la misma IP causaban un conflicto y ninguno tenía red.</li>
+                            <li><strong>Errores tipográficos:</strong> Un número mal en la máscara aislaba al equipo.</li>
+                            <li>Pérdida inmensa de tiempo (horas de trabajo para un administrador).</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://problemasconinternet.com/wp-content/uploads/2021/07/conflicto-de-ip.png" alt="Usuario frustrado" class="slide-image">
+                        <img src="https://www.netbraintech.com/docs/ie80/help/duplicated-ip-sample1_zoom50.png" alt="Usuario frustrado" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Dispositivos móviles -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>La explosión móvil</h2>
+                        <p>Hoy en día, el paradigma manual es <strong>imposible</strong>.</p>
+                        <ul>
+                            <li>Tenemos smartphones, portátiles, tablets, IoT.</li>
+                            <li>Los dispositivos entran y salen de la red constantemente.</li>
+                            <li>El usuario espera conectarse al Wi-Fi y tener internet al instante.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500&q=80" alt="Dispositivos móviles" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. ¿Qué es DHCP? -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>¿Qué es DHCP?</h2>
+                        <p><strong>D</strong>ynamic <strong>H</strong>ost <strong>C</strong>onfiguration <strong>P</strong>rotocol</p>
+                        <ul>
+                            <li>Protocolo de red que asigna automáticamente parámetros de configuración a los dispositivos.</li>
+                            <li>Convierte la red en una experiencia verdaderamente <em>Plug & Play</em>.</li>
+                            <li>Definido en el RFC 2131.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=500&q=80" alt="Cables de red automatizados" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. Arquitectura Cliente-Servidor -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Arquitectura Cliente/Servidor</h2>
+                        <ul>
+                            <li><strong>Servidor DHCP:</strong> El administrador de la red. Posee un "banco" de IPs libres y las reglas de configuración.</li>
+                            <li><strong>Cliente DHCP:</strong> Cualquier equipo (PC, móvil, impresora) configurado para "Obtener una IP automáticamente".</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=500&q=80" alt="Servidor" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. UDP -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Transporte: Protocolo UDP</h2>
+                        <p>DHCP utiliza <strong>UDP</strong> (User Datagram Protocol) en la capa de transporte.</p>
+                        <ul>
+                            <li>Es rápido y de baja latencia.</li>
+                            <li><strong>No orientado a conexión:</strong> No hay un "handshake" previo como en TCP, lo cual es vital porque el cliente aún no tiene IP.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&q=80" alt="Datos a alta velocidad" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 9. Puertos 67 y 68 -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Puertos estandarizados</h2>
+                        <p>Para que la comunicación fluya, cliente y servidor usan puertas distintas:</p>
+                        <ul>
+                            <li><strong>Puerto UDP 67:</strong> El servidor DHCP está siempre a la escucha en este puerto.</li>
+                            <li><strong>Puerto UDP 68:</strong> El cliente escucha aquí las respuestas del servidor.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://media.adeo.com/media/3626363/media.jpg?width=3000&height=3000&format=jpg&quality=80&fit=bounds" alt="Ordenadores antiguos" class="slide-image">
+                        <img src="https://blog.servicioshosting.com/wp-content/uploads/2024/03/puertos-fisicos-vs-logicos-1.png" alt="Ordenadores antiguos" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 10. Broadcast -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Comunicación inicial: Broadcast</h2>
+                        <p>¿Cómo hablas con alguien si no sabes quién es ni dónde está?</p>
+                        <ul>
+                            <li>Al iniciar, el cliente <strong>no tiene IP</strong> y <strong>no sabe la IP del servidor</strong>.</li>
+                            <li>Solución: Hablar a gritos. Envía paquetes a la dirección de <strong>Broadcast</strong> (255.255.255.255 o MAC FF:FF:FF:FF:FF:FF).</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://images.unsplash.com/photo-1589884629108-3193400c7cc9?w=500&q=80" alt="Megáfono" class="slide-image">
+                        <img src="https://www.dongee.com/tutoriales/content/images/2023/03/broadcast.png" alt="Ordenadores antiguos" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 11. DORA Transición -->
+            <section data-background-color="#2c3e50">
+                <h2 style="color: white; text-align: center; font-size: 2.5em;">El núcleo del protocolo:<br>El Proceso D.O.R.A.</h2>
+                <p style="color: #ccc; text-align: center; font-size: 1.2em;">Discover • Offer • Request • Acknowledge</p>
+            </section>
+
+            <!-- 12. Discover -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>1. <span style="color: #e74c3c;">D</span>iscover (Descubrir)</h2>
+                        <ul>
+                            <li><strong>De:</strong> Cliente (IP Origen: 0.0.0.0)</li>
+                            <li><strong>Para:</strong> Broadcast (Destino: 255.255.255.255)</li>
+                            <li><strong>Traducción:</strong> <em>"¡Hola a todos! Acabo de conectarme a esta red, ¿hay algún servidor DHCP que pueda asignarme una IP?"</em></li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://networklessons.com/wp-content/uploads/2013/03/dhcp-discover-1.png" alt="Descubrir" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 13. Offer -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>2. <span style="color: #e74c3c;">O</span>ffer (Ofrecer)</h2>
+                        <ul>
+                            <li><strong>De:</strong> Servidor DHCP</li>
+                            <li><strong>Para:</strong> Cliente (Unicast o Broadcast)</li>
+                            <li><strong>Traducción:</strong> <em>"¡Hola! Te he escuchado. Tengo libre la IP 192.168.1.50. Te la guardo un momento por si la quieres."</em></li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://networklessons.com/wp-content/uploads/2013/03/dhcp-offer.png" alt="Ofrecer" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 14. Request -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>3. <span style="color: #e74c3c;">R</span>equest (Solicitar)</h2>
+                        <ul>
+                            <li><strong>De:</strong> Cliente</li>
+                            <li><strong>Para:</strong> Broadcast (Avisa a todos)</li>
+                            <li><strong>Traducción:</strong> <em>"¡Acepto la IP 192.168.1.50 del Servidor X! El resto de servidores ya pueden liberar las IPs que me hubieran ofrecido."</em></li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://cdn.networklessons.com/wp-content/uploads/2013/03/dhcp-request.png" alt="Solicitar" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 15. Acknowledge -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>4. <span style="color: #e74c3c;">A</span>cknowledge (Confirmar)</h2>
+                        <ul>
+                            <li><strong>De:</strong> Servidor DHCP</li>
+                            <li><strong>Para:</strong> Cliente</li>
+                            <li><strong>Traducción:</strong> <em>"Trato hecho. La IP es tuya oficialmente. Aquí tienes también el DNS y el Router para que navegues."</em></li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://cdn.networklessons.com/wp-content/uploads/2013/03/dhcp-ack.png" alt="Confirmar" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 16. Diagrama Wireshark -->
+            <section>
+                <h2>El proceso visto en captura real</h2>
+                <img src="https://media.licdn.com/dms/image/v2/D5622AQEPsma7orSDag/feedshare-shrink_800/feedshare-shrink_800/0/1714878132064?e=2147483647&v=beta&t=wTiQrhLMUZXVKlBZ5FilgOO-GFfDYm-rX3JwFeisl_c" alt="Diagrama de red DHCP" class="r-stretch" style="background: white; padding: 20px; border-radius: 10px;">
+                <p><small>Secuencia real que veríamos al monitorizar la red con Wireshark.</small></p>
+            </section>
+
+            <!-- 17. Lease Time -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>El "Alquiler" (Lease)</h2>
+                        <p>El DHCP no <em>regala</em> las IPs para siempre, las <strong>presta o alquila</strong> por un tiempo determinado.</p>
+                        <ul>
+                            <li>Si un equipo se desconecta para siempre y la IP fuera fija, el servidor acabaría quedándose sin direcciones.</li>
+                            <li>Gracias al alquiler, las IPs de los equipos inactivos vuelven a estar disponibles.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuqb-YBSCeZqPFcYBjRoulAAGxnBEW7vAfXw&s" alt="TLS" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 18. Tiempos típicos -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Estrategias de Tiempo</h2>
+                        <p>El administrador decide el tiempo según el entorno:</p>
+                        <ul>
+                            <li><strong>Cafeterías/Aeropuertos:</strong> Tiempo muy corto (1 - 2 horas). Alta rotación de clientes.</li>
+                            <li><strong>Oficinas corporativas:</strong> Tiempo medio/largo (8 días). Los equipos son los mismos todos los días.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://media.istockphoto.com/id/1797665673/es/foto/flujo-de-reloj-de-arena.jpg?s=612x612&w=0&k=20&c=2A1SnJ1E8lfIMaQ8if8leXfKr5PLwIArbt0OZ9GaI1I=" alt="Estrategia" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 19. T1 -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Temporizador T1 (Renovación)</h2>
+                        <p>¿Cuándo pide el cliente renovar el alquiler?</p>
+                        <ul>
+                            <li>Ocurre automáticamente al <strong>50%</strong> del tiempo de concesión.</li>
+                            <li>El cliente envía un paquete <code>DHCP Request</code> al servidor original (esta vez por Unicast, directo).</li>
+                            <li>Si el servidor responde, el contador de tiempo vuelve a 0.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://images.unsplash.com/photo-1508962914676-134849a727f0?w=500&q=80" alt="Medio tiempo" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 20. T2 -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Temporizador T2 (Reenganche)</h2>
+                        <p>¿Qué pasa si el servidor original estaba apagado en el 50%?</p>
+                        <ul>
+                            <li>El cliente sigue usando la IP y espera hasta el <strong>87.5%</strong> del tiempo total.</li>
+                            <li>Aquí entra en pánico y envía un Broadcast buscando <em>cualquier</em> servidor DHCP de la red que quiera renovarle el alquiler.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500&q=80" alt="Pánico y gráficas" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 21. Expiración -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Expiración Total</h2>
+                        <p>Si se llega al 100% del tiempo y ningún servidor ha respondido:</p>
+                        <ul>
+                            <li>El cliente tiene la <strong>obligación de soltar la IP</strong>.</li>
+                            <li>Desconecta sus servicios de red.</li>
+                            <li>Vuelve al paso 1: empieza a gritar mensajes <code>DHCP Discover</code> constantemente hasta que alguien responda.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://images.unsplash.com/photo-1494783367193-149034c05e8f?w=500&q=80" alt="Fin del camino" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 22. MAC vs IP -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Un apunte: Hardware vs Lógica</h2>
+                        <p>Para configurar un servidor, debemos entender que vinculamos dos mundos:</p>
+                        <ul>
+                            <li><strong>MAC Address:</strong> Dirección física de la tarjeta de red del cliente. Inmutable.</li>
+                            <li><strong>IP Address:</strong> Dirección lógica que le entregará nuestro servidor DHCP.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://universidadeuropea.com/resources/media/images/diferencia-hard-soft-1200x630.original.jpg" alt="Placa base" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 23. Ámbitos -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Piezas del Servidor: El Ámbito</h2>
+                        <p>El <strong>Ámbito (Scope)</strong> es la agrupación administrativa básica.</p>
+                        <ul>
+                            <li>Define la red física o lógica completa en la que el servidor va a trabajar.</li>
+                            <li>Generalmente, equivale a una subred (ej: <code>192.168.10.0 /24</code>).</li>
+                            <li>Sin ámbito, el servidor está ciego y no hace nada.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://www.garykessler.net/library/images/dhcp_fig5.gif" alt="Ámbito" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 24. Rangos -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>El Rango de Direcciones</h2>
+                        <p>Dentro del ámbito, definimos el tramo exacto que se va a repartir.</p>
+                        <ul>
+                            <li>Ejemplo de ámbito: <code>192.168.1.0</code> a <code>192.168.1.255</code></li>
+                            <li><strong>Rango asignado:</strong> Podríamos decidir repartir solo desde la <code>.100</code> hasta la <code>.200</code>.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://cecomart.com/wp-content/uploads/2023/12/clases-de-ip.jpg" alt="Reglas y rangos" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 25. Exclusiones -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Las Exclusiones</h2>
+                        <p>A veces un rango incluye IPs que ya tienen dueño.</p>
+                        <ul>
+                            <li>Son direcciones <strong>prohibidas</strong> para el servidor DHCP.</li>
+                            <li>¿Por qué? Porque un servidor físico, un switch o una impresora tienen esa IP configurada de forma estática manualmente y no queremos conflictos.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://newserverlife.com/upload/iblock/989/dhcp_server.jpg" alt="Lista VIP exclusiones" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 26. Reservas -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Reservas (MAC Binding)</h2>
+                        <p>Excepciones a la regla de la "dirección dinámica".</p>
+                        <ul>
+                            <li>Le decimos al DHCP: <em>"Cuando veas la tarjeta de red con MAC AA:BB:CC..., no le des una IP aleatoria, dale siempre la 192.168.1.50"</em>.</li>
+                            <li>Muy útil para servidores o impresoras que necesiten una IP fija pero centralizando su gestión en el DHCP.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://source.sierrawireless.com/airlinkos/img/airlinkos/reference/networking/dhcpReservation.png" alt="Reserva de mesa" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 27. Pool -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>El Pool (Piscina)</h2>
+                        <p>Concepto final del agrupamiento de IPs.</p>
+                        <ul>
+                            <li>El Pool es lo que queda matemáticamente: <strong>Rango Total - Exclusiones - Reservas</strong>.</li>
+                            <li>Es el saco real de direcciones que están libres y listas para ser entregadas a los móviles y PCs de los usuarios.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://es.hayward.com/media/wysiwyg/grounding_bonding.jpeg" alt="Piscina/Pool" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 28. Opciones DHCP Intro -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Opciones DHCP (RFC 2132)</h2>
+                        <p>Dar solo una IP a un PC es dejar el trabajo a medias (no podría salir a Internet).</p>
+                        <ul>
+                            <li>El servidor envía <strong>"Opciones"</strong>, metadatos extra que configuran la red a fondo.</li>
+                            <li>Existen decenas de opciones estándar numeradas.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=500&q=80" alt="Opciones" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 29. Opciones 1 -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Opción 1: Máscara de Subred</h2>
+                        <p>La opción más crítica de todas junto a la IP.</p>
+                        <ul>
+                            <li>Le dice al cliente cómo de grande es la red.</li>
+                            <li>Ejemplo: <code>255.255.255.0</code>.</li>
+                            <li>Sin esta opción, el cliente no sabe quién está en su red local y quién está fuera.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs_MCse6qIv1lJfD1uAc8dJwY4mTsM3_koEA&s" alt="Red y máscara" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 30. Opciones 3 -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Opción 3: Router (Puerta de Enlace)</h2>
+                        <p>El camino hacia Internet.</p>
+                        <ul>
+                            <li>Indica la IP del router por el que debe salir el tráfico hacia redes externas.</li>
+                            <li>Normalmente es la primera (<code>.1</code>) o la última (<code>.254</code>) IP de la subred.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://destakamarketing.com/wp-content/uploads/2024/06/que-es-una-puerta-de-enlace.webp" alt="Router de puerta de enlace" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 31. Opciones 6 -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Opción 6: Servidores DNS</h2>
+                        <p>La traducción de nombres.</p>
+                        <ul>
+                            <li>Asigna los servidores que traducen dominios (como google.com) a IPs reales.</li>
+                            <li>Se pueden mandar varios (Primario y Secundario) por si uno falla.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://okitup.com/wp-content/uploads/2019/06/dns.webp" alt="Directorio / DNS" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 32. Opciones PXE -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Opciones 66 y 67 (Arranque PXE)</h2>
+                        <p>Magia avanzada de sistemas.</p>
+                        <ul>
+                            <li>Permiten que un equipo sin sistema operativo arranque e instale Windows o Linux a través de la red.</li>
+                            <li><strong>Opción 66:</strong> IP del servidor TFTP.</li>
+                            <li><strong>Opción 67:</strong> Nombre del archivo de arranque.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://images.unsplash.com/photo-1537432376769-00f5c2f4c8d2?w=500&q=80" alt="PXE" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 33. APIPA Concepto -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>¿Y si el Servidor muere? -> APIPA</h2>
+                        <p><em>Automatic Private IP Addressing</em></p>
+                        <ul>
+                            <li>Si el cliente enciende, grita 'Discover' y nadie responde tras varios intentos, el SO toma el control.</li>
+                            <li>Para no quedarse totalmente inutilizado, se <strong>auto-asigna</strong> una dirección de emergencia.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://i.ytimg.com/vi/OlC7r4hefUA/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLA9l18ZSRw5XF0PgNTO3ftwLeJ5MQ" alt="Fallo de conexión" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 34. APIPA Rango -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>El famoso rango 169.254.x.x</h2>
+                        <p>El síntoma clásico de problemas de red.</p>
+                        <ul>
+                            <li>Cualquier IP que empiece por <span class="alert-text">169.254...</span> significa APIPA.</li>
+                            <li>Permite hablar con otros PCs de la misma sala que también estén en APIPA (red local de rescate).</li>
+                            <li><strong>NO permite salir a Internet</strong> (no hay Puerta de Enlace).</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://support.intermedia.com/euf/assets/images/answers/osvc/27175/27175_2.png" alt="ipconfig en CMD" class="slide-image" style="border: 2px solid white;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 35. Problema VLANs -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>El problema de las redes grandes (VLANs)</h2>
+                        <p>En redes corporativas hay múltiples departamentos (VLANs).</p>
+                        <ul>
+                            <li><strong>Regla sagrada:</strong> Los routers bloquean el tráfico Broadcast de una VLAN a otra.</li>
+                            <li>Si un usuario (VLAN 10) grita 'Discover', el Servidor DHCP central (VLAN 99) <strong>nunca le escuchará</strong>.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://www.infosecuritymexico.com/content/dam/sitebuilder/rxmx/infosecurity-mx/img/2020/Landing-Page-VLANs.png/_jcr_content/renditions/original.image_file.1918.1079.file/Landing-Page-VLANs.png" alt="Muro bloqueando" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 36. DHCP Relay -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>La Solución: DHCP Relay Agent</h2>
+                        <p>También conocido como <em>IP Helper</em>.</p>
+                        <ul>
+                            <li>Se configura en el router principal.</li>
+                            <li>El router escucha el Broadcast local, envuelve la petición y se la manda directamente al Servidor por <strong>Unicast</strong> cruzando las VLANs.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://route2open.com/wp-content/uploads/2025/10/Picture1.webp" alt="relay" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 37. Servidor Linux -->
+            <section>
+                <h2>Implementación: GNU/Linux</h2>
+                <p>Históricamente liderado por <code>isc-dhcp-server</code> (y ahora <code>Kea</code>). Todo por comandos.</p>
+                <div class="code-block">
+<span class="highlight">subnet</span> 10.0.0.0 <span class="highlight">netmask</span> 255.255.255.0 {<br>
+&nbsp;&nbsp;<span class="highlight">range</span> <span class="number">10.0.0.50</span> <span class="number">10.0.0.100</span>;<br>
+&nbsp;&nbsp;<span class="highlight">option</span> routers <span class="number">10.0.0.1</span>;<br>
+&nbsp;&nbsp;<span class="highlight">option</span> domain-name-servers <span class="number">8.8.8.8</span>, <span class="number">1.1.1.1</span>;<br>
+&nbsp;&nbsp;<span class="highlight">default-lease-time</span> <span class="number">600</span>;<br>
+&nbsp;&nbsp;<span class="highlight">max-lease-time</span> <span class="number">7200</span>;<br>
+}
+                </div>
+                <p><small>La sintaxis es implacable: falta un punto y coma (;) y la red entera cae.</small></p>
+            </section>
+
+            <!-- 38. Servidor Windows -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Implementación: Windows Server</h2>
+                        <ul>
+                            <li>Se instala como un "Rol" del servidor.</li>
+                            <li>Gestión completamente gráfica mediante la consola MMC.</li>
+                            <li>Se integra perfectamente con <strong>Active Directory</strong> y actualiza el DNS automáticamente cuando un PC recibe IP.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://servidoresporpiezas.com/wp-content/uploads/2020/04/5-7-1024x559.jpg" alt="Windows Server" class="slide-image" style="background: white; padding: 20px;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 39. Rogue DHCP -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Seguridad: "Rogue DHCP"</h2>
+                        <p>El peligro de los servidores falsos.</p>
+                        <ul>
+                            <li>Cualquiera puede conectar un router doméstico a la red del instituto/empresa.</li>
+                            <li>Ese router empezará a repartir IPs (Offer) más rápido que el servidor legítimo.</li>
+                            <li><strong>Resultado:</strong> Un ataque <em>Man-in-the-Middle</em>. Se intercepta todo el tráfico.</li>
+                            <li><strong>Mitigación:</strong> Función <em>DHCP Snooping</em> en los switches corporativos.</li>
+                        </ul>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://media.geeksforgeeks.org/wp-content/uploads/20220826184312/DHCPRogue1.png" alt="rogue" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 40. Conclusión -->
+            <section>
+                <div class="two-col">
+                    <div class="col-text">
+                        <h2>Conclusión</h2>
+                        <ul>
+                            <li>DHCP es el servicio invisible que mantiene vivas las redes modernas.</li>
+                            <li>Dominar los ámbitos, el proceso DORA y el Relay Agent es fundamental para cualquier técnico ASIR.</li>
+                        </ul>
+                        <br><br>
+                        <h3 class="success-text">¡Gracias por vuestra atención!</h3>
+                        <p>¿Alguna pregunta antes de pasar a las prácticas?</p>
+                    </div>
+                    <div class="col-img">
+                        <img src="https://aodatacloud.es/wp-content/uploads/2024/05/%C2%BFQue-es-el-DHCP-Protocolo-Dinamico-de-Configuracion-de-Host.jpg" alt="Preguntas y trabajo en equipo" class="slide-image">
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Reveal.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            controls: true,
+            progress: true,
+            center: true,
+            hash: false, 
+            history: false,
+            transition: 'slide', 
+            keyboard: true,
+            width: 1024,   
+            height: 768,    
+            margin: 0.08   
+        });
+    </script>
+</body>
+</html>
